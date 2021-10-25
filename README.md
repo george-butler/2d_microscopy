@@ -4,6 +4,9 @@
 
 <sup><sup>1</sup>School of Biological Sciences, University of Reading, Reading, UK</sup>
 
+	
+![quantifying_dispersal_example](/Readme_example_image/quantifying_dispersal.jpg)
+
 This repository is a collection of scripts that can be used to measure the phenotypic traits of migratory cancer cells in 2D phase contrast time-lapse microscopy videos. For more information about the application of these scripts to understand the phenotypic behaviour of experimentally evolved metastatic breast cancer cells then please read our [paper](https://royalsocietypublishing.org/doi/full/10.1098/rspb.2020.2523). Note, the scripts were written to be functional, but not necessarily efficient. As a result, the scripts may need to be adjusted for a resource restricted environment.  
 
 
