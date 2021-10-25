@@ -9,18 +9,18 @@ This repository is a collection of scripts that can be used to measure the pheno
 
 
 ## Workflow
-1. Cell segmentation and tracking 
+# Cell segmentation and tracking 
 The individual cells with each time-lapse video were segmented and then tracked via the[Usiigaci](https://github.com/oist/Usiigaci) cell tracking pipeline. 
 
-2. Cell contour extraction 
+# Cell contour extraction 
 The contour of each cell can then be extracted for all of the images within a given time-lapse video by using the contour_finder.py script in "/Extract_contours/". The location of directory containing the indiviudal segmented images can be set in line 25. It is important to ensure that the "track.csv" file from the Usiigaci tracking output is inside of the "Masks_per_frame" directory as seen in "/Extract_contours/Mask_per_frame". If multiple time-lapse videos have been collected, then lines 64-66 enable each video to be uniquely labeled with a: video number, run number, and video key. The output is then save to a .csv file where the name of the file can be set in line 73. 
 
-3. Distance to a neighbour cell
+# Distance to a neighbour cell
 The distance between each cell can then be measured from the output of the contour_finder.py script by using the vision.py script in the "/Measure_distance_to_neighbouring_cells/" directory. The vision.py script will automatically process every .csv file that is present within the "/Measure_distance_to_neighbouring_cells/" directory and save each file with the suffix "_neighbour.csv". As a result, if you have multiple videos in which you want to measure the distance between neighbouring cells then it is advised to place all of the files into the "/Measure_distance_to_neighbouring_cells/ directory before running. 
 
 Note, the main body of vision.py script is designed to run in parallel across multiple cores within a given system. In its current form the number of available cores will be equal to two less then the total number of cores that are available with in the system. However, this can be adjusted in line 106 by setting "n_jobs" equal to the desired number of cores. 
 
-4. Calculating Zernike moments 
+# Calculating Zernike moments 
 Zernike moments can be calculated for every cell in each of the frames by using the output from the contour_finder.py script and the scripts within the "/Zernike_moments_calculations/" directory. 
 
 First, to make the moments invariant to translation and scale the pre_zernike_measure.py script must be run across all of the images collected within a given experiment. Note, the subsquent moments can only be compared if they have all passed through this stage. As a result, if more data is collected then the old and new images will need to be pushed through the same pipeline. Then, once the script has been run, two metrics will be printed the screen: "avg_radius" and "final_image_size". Finally, the "avg_radius" and "final_image_size" values can then be set in lines 125 and 135 of the zernike_preprocessing_wrapper.py script. 
