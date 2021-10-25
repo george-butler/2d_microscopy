@@ -22,12 +22,12 @@ def contour_counter(cnt,x,y,cell):
     return counter,k_count
 
 
-os.chdir("~/Masks_per_frame")
+os.chdir("~/Extract_contours/Masks_per_frame")
 a = []
 b = []
 c = []
 d = []
-dataframe = pd.read_csv("tracks_update.csv")
+dataframe = pd.read_csv("tracks.csv")
 dataframe.apply(pd.to_numeric)
 dataframe.sort_values(["frame","particle"], ascending=[True,True])
 pngs = sorted(glob("./*.png"))
@@ -61,13 +61,13 @@ a = np.array(a)
 b = np.array(b)
 c = np.array(c)
 d = np.array(d)
-e = np.array([18] * len(a)) #video_number
-f = np.array([9] * len(a)) #run number
-g = np.array([162] * len(a)) #video key
+e = np.array([1] * len(a)) #video_number
+f = np.array([1] * len(a)) #run number
+g = np.array([1] * len(a)) #video key
 
 
 
 datal = list(zip(a,b,d,c,e,f,g))
 df1 = pd.DataFrame(data = datal)
 df1.columns = ["x","y","frame_id","cell_id","video_number","run_number","video_key"]
-df1.to_csv("xy18_12hour_r9.csv", index = False)
+df1.to_csv("xy1_12hour_r1.csv", index = False)

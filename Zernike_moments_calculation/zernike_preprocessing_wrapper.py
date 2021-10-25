@@ -131,10 +131,7 @@ def main_pre(f_name):
     starter = D
     print("Moment order",starter)
 
-    #max_radius_dist = max_dist_cells(dataframe,R,avg_radius)[0]
-    max_radius_dist = 452.20570540407823
 
-    #img_size = roundup(max_radius_dist)*2
     img_size = 920
 
     print("IMG_SIZE", img_size)

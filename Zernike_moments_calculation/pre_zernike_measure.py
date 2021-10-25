@@ -117,6 +117,5 @@ for i in f:
     if img_size > final_image_size:
         final_image_size = img_size
 
-print("final_max_radius_dist",final_max_radius_dist)
-print("final_image_size",final_image_size)
 print("avg_radius",sum(avg_radius_holder)/len(avg_radius_holder))
+print("final_image_size",final_image_size)

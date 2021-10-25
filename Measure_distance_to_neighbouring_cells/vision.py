@@ -102,7 +102,8 @@ def main(a):
 	dataframe.apply(pd.to_numeric)
 
 	frames = dataframe['frame_id'].unique()
-	results_overall = Parallel(n_jobs = 28)(delayed(order)(dataframe,i) for i in frames)
+	num_cores = joblib.cpu_count()
+	results_overall = Parallel(n_jobs = num_cores - 2)(delayed(order)(dataframe,i) for i in frames)
 
 	frame_id = []
 	cell_id = []
