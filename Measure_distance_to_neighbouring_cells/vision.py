@@ -3,6 +3,14 @@ import numpy as np
 from joblib import Parallel, delayed
 import sys
 from glob import glob
+import joblib 
+
+def unpacking_data(t):
+    dataframe = np.empty((0,t[0].shape[1]))
+    for i in t:
+        dataframe = np.vstack([dataframe,i])
+    df = pd.DataFrame(dataframe, columns = ['frame_id','cell_id','cell_x','cell_y','neighbor_x','neighbor_y','neighbor_id'])
+    return df
 
 
 def dist(x1,y1,x2,y2):
@@ -66,35 +74,32 @@ def vision (ax,ay,bx,by,a):
 	return holder
 
 
-def worker (a,b):
-	results = []
+def worker (a,b,frame,cell):
+	results = np.empty((0,7))
 	for i in range(len(a.index)):
-		ax = a['x'][i]
-		ay = a['y'][i]
-		bx = np.array(b['x'])
-		by = np.array(b['y'])
+		ax,ay = a['x'][i],a['y'][i]
+		bx,by = np.array(b['x']),np.array(b['y'])
 		distance = dist(ax,ay,bx,by)
 		order_values = np.argsort(distance)
-
 		for k in order_values:
 			output = vision(ax,ay,b['x'][k],b['y'][k],a)
 			if output == False:
-				results.append([ax,ay,b['x'][k],b['y'][k],b['cell_id'][k]])
+				d = np.column_stack([frame,cell,ax,ay,b['x'][k],b['y'][k],b['cell_id'][k]])
+				results = np.vstack([results,d])
 				break
 	return results
 
 def order(df,i):
 	frame_n = df[df.frame_id == i]
-	results = []
+	results = np.empty((0,7))
 	cells = frame_n['cell_id'].unique()
 	for j in cells:
 		a = frame_n[frame_n.cell_id == j]
 		b = frame_n[frame_n.cell_id != j]
 		a = a.reset_index(drop = True)
 		b = b.reset_index(drop = True)
-		holder = worker(a,b)
-		holder.extend([j,i])
-		results.append(holder)
+		holder = worker(a,b,i,j)
+		results = np.vstack([results,holder])
 	return results
 ##########################################################################################################################
 def main(a):
@@ -103,30 +108,11 @@ def main(a):
 
 	frames = dataframe['frame_id'].unique()
 	num_cores = joblib.cpu_count()
-	results_overall = Parallel(n_jobs = num_cores - 2)(delayed(order)(dataframe,i) for i in frames)
+	results_overall = Parallel(n_jobs = num_cores - 2, backend="threading",verbose =5 )(delayed(order)(dataframe,i) for i in frames)
 
-	frame_id = []
-	cell_id = []
-	cell_x = []
-	cell_y = []
-	neighbor_x = []
-	neighbor_y = []
-	neighbour_id = []
-	for i in range(len(results_overall)):
-		for j in range(len(results_overall[i])):
-			length = len(results_overall[i][j])
-			frame_id.extend(([results_overall[i][j][(length-1)]] * (length-3)))
-			cell_id.extend(([results_overall[i][j][(length-2)]] * (length-3)))
-			for k in range(length-3):
-				cell_x.append(results_overall[i][j][k][0])
-				cell_y.append(results_overall[i][j][k][1])
-				neighbor_x.append(results_overall[i][j][k][2])
-				neighbor_y.append(results_overall[i][j][k][3])
-				neighbour_id.append(results_overall[i][j][k][4])
+	df = unpacking_data(results_overall)
 
-	datal = list(zip(frame_id,cell_id,cell_x,cell_y,neighbor_x,neighbor_y,neighbour_id))
-	df = pd.DataFrame(data = datal)
-	df.columns=['frame_id','cell_id','cell_x','cell_y','neighbor_x','neighbor_y','neighbor_id']
+	df.to_csv(a[:-4]+str("_neighbour.csv"), index = False)
 
 	holder = []
 	holder1 = []
@@ -137,14 +123,9 @@ def main(a):
 
 	df['distance_to_neighbor']= holder
 	df['inverse_dist']=holder1
-	df["video_number"]=np.array([dataframe['video_number'][0]] * len(holder))
-	df["run_number"]=np.array([dataframe["run_number"][0]] * len(holder))
-	df["video_key"]=np.array([dataframe["video_key"][0]] * len(holder))
-
 	df.to_csv(a[:-4]+str("_neighbour.csv"), index = False)
 
 
 f = glob("*.csv")
 for i in f:
 	print(i)
-	main(i)
