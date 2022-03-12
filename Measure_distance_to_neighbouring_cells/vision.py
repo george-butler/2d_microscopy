@@ -129,3 +129,4 @@ def main(a):
 f = glob("*.csv")
 for i in f:
 	print(i)
+	main(i)
